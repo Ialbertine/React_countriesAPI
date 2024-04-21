@@ -1,7 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import Regions from "./pages/Regions";
 import NotFound from "./pages/NotFound";
 import HomeLayout from "./layouts/HomeLayout";
 import OtherLayouts from "./layouts/OtherLayouts";
@@ -16,14 +15,6 @@ const App = () => {
             <HomeLayout>
               <Home />
             </HomeLayout>
-          }
-        />
-        <Route
-          path="/regions"
-          element={
-            <OtherLayouts>
-              <Regions />
-            </OtherLayouts>
           }
         />
         <Route

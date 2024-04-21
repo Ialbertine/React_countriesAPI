@@ -4,17 +4,19 @@ import { getCountries } from "../apis/countries";
 import { useSearchParams } from "react-router-dom";
 import Pagination from "./Pagination";
 
+
 const Countries = () => {
   const [listOfCountries, setListOfCountries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams({ page: 1 });
+  const [selectedRegion, setSelectedRegion] = useState(""); // State for selected region
 
   useEffect(() => {
     let pageNumber = Number(searchParams.get("page"));
 
     setLoading(true);
 
-    getCountries(pageNumber)
+    getCountries(pageNumber, selectedRegion) // Pass selectedRegion to the API call
       .then((data) => {
         setListOfCountries(data);
       })
@@ -24,18 +26,49 @@ const Countries = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [searchParams, selectedRegion]); // Include selectedRegion in dependency array
+
+    const handleRegion = (e) => {
+      setLoading(true);
+      const region = e.target.value;
+      console.log(region);
+      if (region !== "All") {
+        const fetchSearch = async () => {
+          const fetchData = await fetch(
+            `https://restcountries.com/v3.1/region/${region}`
+          );
+          const response = await fetchData.json().then(setLoading(false));
+
+          if (response.status !== 404) {
+            setListOfCountries(response);
+          }
+        };
+
+        try {
+          fetchSearch();
+        } catch (error) {
+          console.log(error);
+        }
+      } else {
+        fetchData();
+      }
+    };
 
   return (
     <CountriesSection>
-      {/* Top part  */}
+      {/* Top part */}
       <div id="top-section">
         <div>
           <h3>View Countries</h3>
           <p>Page {Number(searchParams.get("page"))} of 5</p>
         </div>
-        <select>
-          <option value="">Select region</option>
+        <select name="region" onChange={handleRegion} value={selectedRegion}>
+          <option value="">Regions</option>
+          <option value="Asia">Asia</option>
+          <option value="Africa">Africa</option>
+          <option value="America">America</option>
+          <option value="Europe">Europe</option>
+          <option value="Oceania">Oceania</option>
         </select>
       </div>
 
@@ -45,40 +78,40 @@ const Countries = () => {
         className="flex flex-wrap w-full justify-between md:gap-1"
       >
         {listOfCountries.length > 0 &&
-          listOfCountries.map((country, index) => {
-            return (
-              <div key={index} className="w-5/12 md:w-1/5 mb-5 text-gray-500">
-                <img src={country.flags.svg} alt={country.flags.alt} />
+          listOfCountries.map((country, index) => (
+            <div
+              key={index}
+              className="w-[48%] md:w-[30%] mb-5 text-gray-900 py-4 px-4 shadow hover:shadow-2xl rounded-2xl"
+            >
+              <img src={country.flags.svg} alt={country.flags.alt} />
+              <div className="py-3 text-center uppercase font-semibold">
                 <p>{country.name.common}</p>
-                <p>{country.capital}</p>
-                <p>{country.population}</p>
-                <p>{country.continents}</p>
               </div>
-            );
-          })}
+              <div className="flex flex-col gap-3">
+                <p>
+                  <span className="font-medium">Capital:</span>{" "}
+                  {country.capital}
+                </p>
+                <p>
+                  <span className="font-medium">Population:</span>{" "}
+                  {country.population}
+                </p>
+                <p>
+                  <span className="font-medium">Region:</span>{" "}
+                  {country.continents}
+                </p>
+              </div>
+            </div>
+          ))}
 
         {loading && <p>Loading...</p>}
 
         {!loading && listOfCountries.length === 0 && (
           <p>No countries available</p>
         )}
-
-        {/* Using Ternary operators */}
-        {/* {listOfCountries.length > 0
-          ? 
-            listOfCountries.length > 0 && listOfCountries.map((country, index) => {
-              return (
-                <div key={index}>
-                  <img src={country.flag} alt={country.name} />
-                  <p>{country.name}</p>
-                </div>
-              )
-            })
-          : <p>No countries available</p>
-        } */}
       </div>
 
-      {/* Pagination  */}
+      {/* Pagination */}
       <Pagination
         searchParams={searchParams}
         setSearchParams={setSearchParams}

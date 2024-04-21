@@ -17,7 +17,7 @@ const Header = () => {
           name="search"
           id="search"
           placeholder="Search country by name"
-          className="px-5 py-3 w-full md:w-1/2"
+          className="px-5 py-3 w-full md:w-1/2 text-black"
         />
       </SectionHolder>
     </section>

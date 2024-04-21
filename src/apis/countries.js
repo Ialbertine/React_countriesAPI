@@ -26,4 +26,5 @@ export const getCountries = async (page) => {
 
     return countries;
   }
+
 };
